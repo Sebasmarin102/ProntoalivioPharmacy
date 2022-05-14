@@ -17,7 +17,7 @@ namespace ProntoalivioPharmacy.Controllers
 
         public async Task<IActionResult> Index()
         {
-              return View(await _context.Cities.ToListAsync());
+            return View(await _context.Cities.ToListAsync());
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -48,9 +48,28 @@ namespace ProntoalivioPharmacy.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(city);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(city);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException dbUpdateException)
+                {
+                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
+                    {
+                        ModelState.AddModelError(string.Empty, "Ya existe una ciudad con el mismo nombre.");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    ModelState.AddModelError(string.Empty, exception.Message);
+                }
+
             }
 
             return View(city);
@@ -58,25 +77,23 @@ namespace ProntoalivioPharmacy.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Cities == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var city = await _context.Cities.FindAsync(id);
+            City city = await _context.Cities.FindAsync(id);
             if (city == null)
             {
                 return NotFound();
             }
+
             return View(city);
         }
 
-        // POST: Cities/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] City city)
+        public async Task<IActionResult> Edit(int id, City city)
         {
             if (id != city.Id)
             {
@@ -89,33 +106,37 @@ namespace ProntoalivioPharmacy.Controllers
                 {
                     _context.Update(city);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException dbUpdateException)
                 {
-                    if (!CityExists(city.Id))
+                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
                     {
-                        return NotFound();
+                        ModelState.AddModelError(string.Empty, "Ya existe una ciudad con el mismo nombre.");
                     }
                     else
                     {
-                        throw;
+                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                catch (Exception exception)
+                {
+                    ModelState.AddModelError(string.Empty, exception.Message);
+                }
+
             }
             return View(city);
         }
 
-        // GET: Cities/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Cities == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var city = await _context.Cities
-                .FirstOrDefaultAsync(m => m.Id == id);
+            City city = await _context.Cities
+                .FirstOrDefaultAsync(c => c.Id == id);
             if (city == null)
             {
                 return NotFound();
@@ -124,28 +145,15 @@ namespace ProntoalivioPharmacy.Controllers
             return View(city);
         }
 
-        // POST: Cities/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Cities == null)
-            {
-                return Problem("Entity set 'DataContext.Cities'  is null.");
-            }
-            var city = await _context.Cities.FindAsync(id);
-            if (city != null)
-            {
-                _context.Cities.Remove(city);
-            }
-            
+            City city = await _context.Cities.FindAsync(id);
+            _context.Cities.Remove(city);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CityExists(int id)
-        {
-          return (_context.Cities?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
     }
 }
