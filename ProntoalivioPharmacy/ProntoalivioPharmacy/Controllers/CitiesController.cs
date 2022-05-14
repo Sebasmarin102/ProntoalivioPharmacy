@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProntoalivioPharmacy.Data;
@@ -19,22 +15,20 @@ namespace ProntoalivioPharmacy.Controllers
             _context = context;
         }
 
-        // GET: Cities
         public async Task<IActionResult> Index()
         {
               return View(await _context.Cities.ToListAsync());
         }
 
-        // GET: Cities/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Cities == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var city = await _context.Cities
-                .FirstOrDefaultAsync(m => m.Id == id);
+            City city = await _context.Cities
+                .FirstOrDefaultAsync(c => c.Id == id);
             if (city == null)
             {
                 return NotFound();
@@ -43,18 +37,14 @@ namespace ProntoalivioPharmacy.Controllers
             return View(city);
         }
 
-        // GET: Cities/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Cities/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] City city)
+        public async Task<IActionResult> Create(City city)
         {
             if (ModelState.IsValid)
             {
@@ -62,10 +52,10 @@ namespace ProntoalivioPharmacy.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(city);
         }
 
-        // GET: Cities/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Cities == null)
