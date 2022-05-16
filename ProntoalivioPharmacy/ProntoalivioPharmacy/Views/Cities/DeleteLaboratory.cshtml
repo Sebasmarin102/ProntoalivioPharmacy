@@ -1,0 +1,18 @@
+﻿@model ProntoalivioPharmacy.Data.Entities.Laboratory
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Borrar</h1>
+
+<h3>¿Esta seguro de querer borrar?</h3>
+<div>
+    <partial name="_LaboratoryDetails" />
+    <form asp-action="DeleteLaboratory">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Eliminar" class="btn btn-outline-danger" />
+        <a asp-action="DetailsNeighborhood" asp-route-id="@Model?.Neighborhood.Id" class="btn btn-outline-success">Regresar</a>
+    </form>
+</div>
+

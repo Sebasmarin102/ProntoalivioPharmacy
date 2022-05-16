@@ -32,6 +32,7 @@ namespace ProntoalivioPharmacy.Controllers
 
             City city = await _context.Cities
                 .Include(c => c.Neighborhoods)
+                .ThenInclude(c => c.Laboratories)
                 .FirstOrDefaultAsync(c => c.Id == id);
             if (city == null)
             {
@@ -39,6 +40,43 @@ namespace ProntoalivioPharmacy.Controllers
             }
 
             return View(city);
+        }
+
+        public async Task<IActionResult> DetailsNeighborhood(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Neighborhood neighborhood = await _context.Neighborhoods
+                .Include(n => n.City)
+                .Include(n => n.Laboratories)
+                .FirstOrDefaultAsync(c => c.Id == id);
+            if (neighborhood == null)
+            {
+                return NotFound();
+            }
+
+            return View(neighborhood);
+        }
+
+        public async Task<IActionResult> DetailsLaboratory(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Laboratory laboratory = await _context.Laboratories
+                .Include(l => l.Neighborhood)
+                .FirstOrDefaultAsync(l => l.Id == id);
+            if (laboratory == null)
+            {
+                return NotFound();
+            }
+
+            return View(laboratory);
         }
 
         public IActionResult Create()
@@ -140,6 +178,65 @@ namespace ProntoalivioPharmacy.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> AddLaboratory(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Neighborhood neighborhood = await _context.Neighborhoods.FindAsync(id);
+            if (neighborhood == null)
+            {
+                return NotFound();
+            }
+
+            LaboratoryViewModel model = new()
+            {
+                NeighborhoodId = neighborhood.Id,
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddLaboratory(LaboratoryViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Laboratory laboratory = new()
+                    {
+                        Neighborhood = await _context.Neighborhoods.FindAsync(model.NeighborhoodId),
+                        Name = model.Name,
+                    };
+                    _context.Add(laboratory);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(DetailsNeighborhood), new { Id = model.NeighborhoodId });
+                }
+                catch (DbUpdateException dbUpdateException)
+                {
+                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
+                    {
+                        ModelState.AddModelError(string.Empty, "Ya existe un laboratorio/farmacia con el mismo nombre en este barrio.");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    ModelState.AddModelError(string.Empty, exception.Message);
+                }
+
+            }
+
+            return View(model);
+        }
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -147,7 +244,9 @@ namespace ProntoalivioPharmacy.Controllers
                 return NotFound();
             }
 
-            City city = await _context.Cities.FindAsync(id);
+            City city = await _context.Cities
+                .Include(c => c.Neighborhoods)
+                .FirstOrDefaultAsync(c => c.Id == id);
             if (city == null)
             {
                 return NotFound();
@@ -260,6 +359,73 @@ namespace ProntoalivioPharmacy.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> EditLaboratory(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Laboratory laboratory = await _context.Laboratories
+                .Include(l => l.Neighborhood)
+                .FirstOrDefaultAsync(l => l.Id == id);
+            if (laboratory == null)
+            {
+                return NotFound();
+            }
+
+            LaboratoryViewModel model = new()
+            {
+                NeighborhoodId = laboratory.Neighborhood.Id,
+                Id = laboratory.Id,
+                Name = laboratory.Name,
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditLaboratory(int id, LaboratoryViewModel model)
+        {
+            if (id != model.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Laboratory laboratory = new()
+                    {
+                        Id = model.Id,
+                        Name = model.Name,
+                    };
+                    _context.Update(laboratory);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(DetailsNeighborhood), new { Id = model.NeighborhoodId });
+                }
+                catch (DbUpdateException dbUpdateException)
+                {
+                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
+                    {
+                        ModelState.AddModelError(string.Empty, "Ya existe un laboratorio/farmacia con el mismo nombre en este barrio.");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    ModelState.AddModelError(string.Empty, exception.Message);
+                }
+
+            }
+            return View(model);
+        }
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -286,6 +452,67 @@ namespace ProntoalivioPharmacy.Controllers
             _context.Cities.Remove(city);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> DeleteNeighborhood(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Neighborhood neighborhood = await _context.Neighborhoods
+                .Include(n => n.City)
+                .Include(n => n.Laboratories)
+                .FirstOrDefaultAsync(n => n.Id == id);
+            if (neighborhood == null)
+            {
+                return NotFound();
+            }
+
+            return View(neighborhood);
+        }
+
+        [HttpPost, ActionName("DeleteNeighborhood")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteNeighborhoodConfirmed(int id)
+        {
+            Neighborhood neighborhood = await _context.Neighborhoods
+                .Include(n => n.City)
+                .FirstOrDefaultAsync(n => n.Id == id);
+            _context.Neighborhoods.Remove(neighborhood);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { Id = neighborhood.City.Id });
+        }
+
+        public async Task<IActionResult> DeleteLaboratory(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Laboratory laboratory = await _context.Laboratories
+                .Include(l => l.Neighborhood)
+                .FirstOrDefaultAsync(l => l.Id == id);
+            if (laboratory == null)
+            {
+                return NotFound();
+            }
+
+            return View(laboratory);
+        }
+
+        [HttpPost, ActionName("DeleteLaboratory")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteLaboratoryConfirmed(int id)
+        {
+            Laboratory laboratory = await _context.Laboratories
+                .Include(l => l.Neighborhood)
+                .FirstOrDefaultAsync(l => l.Id == id);
+            _context.Laboratories.Remove(laboratory);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(DetailsNeighborhood), new { Id = laboratory.Neighborhood.Id });
         }
 
     }
