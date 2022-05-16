@@ -2,17 +2,14 @@
 
 namespace ProntoalivioPharmacy.Data.Entities
 {
-    public class City
+    public class Laboratory
     {
         public int Id { get; set; }
 
-        [Display(Name = "Ciudad")]
+        [Display(Name = "Laboratorio")]
         [MaxLength(50, ErrorMessage = "El campo {0} debe tener maximo {1} caractéres.")]
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         public string Name { get; set; }
-        public ICollection<Neighborhood> Neighborhoods { get; set; }
-
-        [Display(Name = "Barrios")]
-        public int NeighborhoodsNumber => Neighborhoods == null ? 0 : Neighborhoods.Count;
+        public Neighborhood Neighborhood { get; set; }
     }
 }

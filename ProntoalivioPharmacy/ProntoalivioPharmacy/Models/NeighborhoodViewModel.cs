@@ -1,18 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ProntoalivioPharmacy.Data.Entities
+namespace ProntoalivioPharmacy.Models
 {
-    public class City
+    public class NeighborhoodViewModel
     {
         public int Id { get; set; }
 
-        [Display(Name = "Ciudad")]
+        [Display(Name = "Barrio")]
         [MaxLength(50, ErrorMessage = "El campo {0} debe tener maximo {1} caractéres.")]
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         public string Name { get; set; }
-        public ICollection<Neighborhood> Neighborhoods { get; set; }
-
-        [Display(Name = "Barrios")]
-        public int NeighborhoodsNumber => Neighborhoods == null ? 0 : Neighborhoods.Count;
+        public int CityId { get; set; }
     }
 }
