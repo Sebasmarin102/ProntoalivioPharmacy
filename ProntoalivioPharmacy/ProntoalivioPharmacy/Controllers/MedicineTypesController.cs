@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProntoalivioPharmacy.Data;
 using ProntoalivioPharmacy.Data.Entities;
 
 namespace ProntoalivioPharmacy.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class MedicineTypesController : Controller
     {
         private readonly DataContext _context;
