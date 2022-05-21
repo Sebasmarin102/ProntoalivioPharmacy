@@ -93,7 +93,7 @@ namespace ProntoalivioPharmacy.Data
                 });
                 _context.Cities.Add(new City
                 {
-                    Name = "Bogota",
+                    Name = "Bogotá",
                     Neighborhoods = new List<Neighborhood>()
                     {
                         new Neighborhood {
