@@ -41,7 +41,7 @@ namespace ProntoalivioPharmacy.Models
             : $"https://prontoalivio.blob.core.windows.net/users/{ImageId}";
 
         [Display(Name = "Image")]
-        public IFormFile ImageFile { get; set; }
+        public IFormFile? ImageFile { get; set; }
 
         [Display(Name = "Ciudad")]
         [Range(1, int.MaxValue, ErrorMessage = "Debes de seleccionar una ciudad.")]

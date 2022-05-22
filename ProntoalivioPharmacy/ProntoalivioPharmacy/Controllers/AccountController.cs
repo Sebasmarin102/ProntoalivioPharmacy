@@ -5,6 +5,7 @@ using ProntoalivioPharmacy.Data.Entities;
 using ProntoalivioPharmacy.Enums;
 using ProntoalivioPharmacy.Helpers;
 using ProntoalivioPharmacy.Models;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace ProntoalivioPharmacy.Controllers
 {
@@ -39,13 +40,21 @@ namespace ProntoalivioPharmacy.Controllers
         {
             if (ModelState.IsValid)
             {
-                Microsoft.AspNetCore.Identity.SignInResult result = await _userHelper.LoginAsync(model);
+                SignInResult result = await _userHelper.LoginAsync(model);
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Index", "Home");
                 }
 
-                ModelState.AddModelError(string.Empty, "Email o contraseña incorrectos.");
+                if (result.IsLockedOut)
+                {
+                    ModelState.AddModelError(string.Empty, "Ha superado el máximo número de intentos, " +
+                        "su cuenta está bloqueada, intente de nuevo en 5 minutos.");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Email o contraseña incorrectos.");
+                }
             }
 
             return View(model);
