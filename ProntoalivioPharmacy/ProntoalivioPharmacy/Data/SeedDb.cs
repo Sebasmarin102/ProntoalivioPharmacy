@@ -21,8 +21,10 @@ namespace ProntoalivioPharmacy.Data
             await CheckMedicineTypesAsync();
             await CheckCitiesAsync();
             await CheckRolesAsync();
-            await CheckUserAsync("1010", "Sebas", "Posada", "sebasposada@yopmail.com", "300 872 3420", "Calle Luna Calle Sol", UserType.Admin);
-            await CheckUserAsync("2020", "Marce", "Marin", "marcemarin@yopmail.com", "300 872 3420", "Calle Luna Calle Sol", UserType.User);
+            await CheckUserAsync("1010", "Sebas", "Posada", "sebasposada@yopmail.com", "300 872 3420", 
+                "Calle Luna Calle Sol", UserType.Admin);
+            await CheckUserAsync("2020", "Marce", "Marin", "marcemarin@yopmail.com", "300 872 3420", 
+                "Calle Luna Calle Sol", UserType.User);
         }
 
         private async Task<User> CheckUserAsync(string document,
@@ -51,6 +53,9 @@ namespace ProntoalivioPharmacy.Data
 
                 await _userHelper.AddUserAsync(user, "123456");
                 await _userHelper.AddUserToRoleAsync(user, userType.ToString());
+
+                string token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                await _userHelper.ConfirmEmailAsync(user, token);
             }
 
             return user;

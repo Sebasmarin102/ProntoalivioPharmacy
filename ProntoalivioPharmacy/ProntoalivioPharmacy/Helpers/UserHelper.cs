@@ -114,5 +114,15 @@ namespace ProntoalivioPharmacy.Helpers
         {
             return await _userManager.UpdateAsync(user);
         }
+
+        public async Task<IdentityResult> ConfirmEmailAsync(User user, string token)
+        {
+            return await _userManager.ConfirmEmailAsync(user, token);
+        }
+
+        public async Task<string> GenerateEmailConfirmationTokenAsync(User user)
+        {
+            return await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        }
     }
 }
