@@ -14,5 +14,9 @@ namespace ProntoalivioPharmacy.Helpers
         Task<bool> IsUserInRoleAsync(User user, string roleName);
         Task<SignInResult> LoginAsync(LoginViewModel model);
         Task LogoutAsync();
+        Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword);
+        Task<IdentityResult> UpdateUserAsync(User user);
+        Task<User> GetUserAsync(Guid userId);
+
     }
 }
