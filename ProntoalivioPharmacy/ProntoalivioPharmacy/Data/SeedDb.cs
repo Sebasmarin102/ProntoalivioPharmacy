@@ -21,10 +21,8 @@ namespace ProntoalivioPharmacy.Data
             await CheckMedicineTypesAsync();
             await CheckCitiesAsync();
             await CheckRolesAsync();
-            await CheckUserAsync("1010", "Sebas", "Posada", "sebasposada@yopmail.com", "300 872 3420", 
-                "Calle Luna Calle Sol", UserType.Admin);
-            await CheckUserAsync("2020", "Marce", "Marin", "marcemarin@yopmail.com", "300 872 3420", 
-                "Calle Luna Calle Sol", UserType.User);
+            await CheckUserAsync("1010", "Sebas", "Posada", "sebasposada@yopmail.com", "300 872 3420", "Calle Luna Calle Sol", UserType.Admin);
+            await CheckUserAsync("2020", "Marce", "Marin", "marcemarin@yopmail.com", "300 872 3420", "Calle Luna Calle Sol", UserType.User);
         }
 
         private async Task<User> CheckUserAsync(string document,

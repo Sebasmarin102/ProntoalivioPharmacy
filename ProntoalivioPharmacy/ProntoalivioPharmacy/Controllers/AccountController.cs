@@ -124,7 +124,7 @@ namespace ProntoalivioPharmacy.Controllers
                     $"{model.FirstName} {model.LastName}",
                     model.Username,
                     "Shopping - Confirmación de Email",
-                    $"<h1>Shopping - Confirmación de Email</h1>" +
+                    $"<h1>Prontoalivio - Confirmación de Email</h1>" +
                         $"Para habilitar el usuario por favor hacer clic en el siguiente link:, " +
                         $"<hr/><br/><p><a href = \"{tokenLink}\">Confirmar Email</a></p>");
                 if (response.IsSuccess)
@@ -138,6 +138,28 @@ namespace ProntoalivioPharmacy.Controllers
 
             model.Cities = await _combosHelper.GetComboCitiesAsync();
             return View(model);
+        }
+
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            {
+                return NotFound();
+            }
+
+            User user = await _userHelper.GetUserAsync(new Guid(userId));
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            IdentityResult result = await _userHelper.ConfirmEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+                return NotFound();
+            }
+
+            return View();
         }
 
         public async Task<IActionResult> ChangeUser()
@@ -234,26 +256,65 @@ namespace ProntoalivioPharmacy.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        public IActionResult RecoverPassword()
         {
-            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
-            {
-                return NotFound();
-            }
-
-            User user = await _userHelper.GetUserAsync(new Guid(userId));
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            IdentityResult result = await _userHelper.ConfirmEmailAsync(user, token);
-            if (!result.Succeeded)
-            {
-                return NotFound();
-            }
-
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                User user = await _userHelper.GetUserAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "El email no corresponde a ningún usuario registrado.");
+                    return View(model);
+                }
+
+                string myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+                string link = Url.Action(
+                    "ResetPassword",
+                    "Account",
+                    new { token = myToken }, protocol: HttpContext.Request.Scheme);
+                _mailHelper.SendMail(
+                    $"{user.FullName}",
+                    model.Email,
+                    "Shopping - Recuperación de Contraseña",
+                    $"<h1>Prontoalivio - Recuperación de Contraseña</h1>" +
+                    $"Para recuperar la contraseña haga click en el siguiente enlace:" +
+                    $"<p><a href = \"{link}\">Reset Password</a></p>");
+                ViewBag.Message = "Las instrucciones para recuperar la contraseña han sido enviadas a su correo.";
+                return View();
+            }
+
+            return View(model);
+        }
+
+        public IActionResult ResetPassword(string token)
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            User user = await _userHelper.GetUserAsync(model.UserName);
+            if (user != null)
+            {
+                IdentityResult result = await _userHelper.ResetPasswordAsync(user, model.Token, model.Password);
+                if (result.Succeeded)
+                {
+                    ViewBag.Message = "Contraseña cambiada con éxito.";
+                    return View();
+                }
+
+                ViewBag.Message = "Error cambiando la contraseña.";
+                return View(model);
+            }
+
+            ViewBag.Message = "Usuario no encontrado.";
+            return View(model);
         }
 
     }
