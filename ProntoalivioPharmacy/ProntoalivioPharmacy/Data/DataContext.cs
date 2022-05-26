@@ -13,6 +13,9 @@ namespace ProntoalivioPharmacy.Data
         public DbSet<Laboratory> Laboratories { get; set; }
         public DbSet<MedicineType> MedicineTypes { get; set; }
         public DbSet<Neighborhood> Neighborhoods { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<ProductImage> ProductImages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -20,6 +23,8 @@ namespace ProntoalivioPharmacy.Data
             modelBuilder.Entity<MedicineType>().HasIndex(m => m.Name).IsUnique();
             modelBuilder.Entity<Neighborhood>().HasIndex("Name", "CityId").IsUnique();
             modelBuilder.Entity<Laboratory>().HasIndex("Name", "NeighborhoodId").IsUnique();
+            modelBuilder.Entity<Product>().HasIndex(p => p.Name).IsUnique();
+            modelBuilder.Entity<ProductCategory>().HasIndex("ProductId", "MedicineTypeId").IsUnique();
         }
 
     }

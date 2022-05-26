@@ -12,8 +12,8 @@ using ProntoalivioPharmacy.Data;
 namespace ProntoalivioPharmacy.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220518021450_AddUserEntities")]
-    partial class AddUserEntities
+    [Migration("20220526213040_DBUntilProducts")]
+    partial class DBUntilProducts
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -191,7 +191,7 @@ namespace ProntoalivioPharmacy.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("NeighborhoodId")
+                    b.Property<int?>("NeighborhoodId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -199,7 +199,8 @@ namespace ProntoalivioPharmacy.Migrations
                     b.HasIndex("NeighborhoodId");
 
                     b.HasIndex("Name", "NeighborhoodId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[NeighborhoodId] IS NOT NULL");
 
                     b.ToTable("Laboratories");
                 });
@@ -233,7 +234,7 @@ namespace ProntoalivioPharmacy.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("CityId")
+                    b.Property<int?>("CityId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -246,9 +247,87 @@ namespace ProntoalivioPharmacy.Migrations
                     b.HasIndex("CityId");
 
                     b.HasIndex("Name", "CityId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[CityId] IS NOT NULL");
 
                     b.ToTable("Neighborhoods");
+                });
+
+            modelBuilder.Entity("ProntoalivioPharmacy.Data.Entities.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<float>("Stock")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("ProntoalivioPharmacy.Data.Entities.ProductCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("MedicineTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicineTypeId");
+
+                    b.HasIndex("ProductId", "MedicineTypeId")
+                        .IsUnique()
+                        .HasFilter("[ProductId] IS NOT NULL AND [MedicineTypeId] IS NOT NULL");
+
+                    b.ToTable("ProductCategories");
+                });
+
+            modelBuilder.Entity("ProntoalivioPharmacy.Data.Entities.ProductImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<Guid>("ImageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductImages");
                 });
 
             modelBuilder.Entity("ProntoalivioPharmacy.Data.Entities.User", b =>
@@ -264,7 +343,7 @@ namespace ProntoalivioPharmacy.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("CityId")
+                    b.Property<int?>("CityId")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -402,9 +481,7 @@ namespace ProntoalivioPharmacy.Migrations
                 {
                     b.HasOne("ProntoalivioPharmacy.Data.Entities.Neighborhood", "Neighborhood")
                         .WithMany("Laboratories")
-                        .HasForeignKey("NeighborhoodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("NeighborhoodId");
 
                     b.Navigation("Neighborhood");
                 });
@@ -413,20 +490,40 @@ namespace ProntoalivioPharmacy.Migrations
                 {
                     b.HasOne("ProntoalivioPharmacy.Data.Entities.City", "City")
                         .WithMany("Neighborhoods")
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CityId");
 
                     b.Navigation("City");
+                });
+
+            modelBuilder.Entity("ProntoalivioPharmacy.Data.Entities.ProductCategory", b =>
+                {
+                    b.HasOne("ProntoalivioPharmacy.Data.Entities.MedicineType", "MedicineType")
+                        .WithMany("ProductCategories")
+                        .HasForeignKey("MedicineTypeId");
+
+                    b.HasOne("ProntoalivioPharmacy.Data.Entities.Product", "Product")
+                        .WithMany("ProductCategories")
+                        .HasForeignKey("ProductId");
+
+                    b.Navigation("MedicineType");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ProntoalivioPharmacy.Data.Entities.ProductImage", b =>
+                {
+                    b.HasOne("ProntoalivioPharmacy.Data.Entities.Product", "Product")
+                        .WithMany("ProductImages")
+                        .HasForeignKey("ProductId");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("ProntoalivioPharmacy.Data.Entities.User", b =>
                 {
                     b.HasOne("ProntoalivioPharmacy.Data.Entities.City", "City")
                         .WithMany("Users")
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CityId");
 
                     b.Navigation("City");
                 });
@@ -438,9 +535,21 @@ namespace ProntoalivioPharmacy.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("ProntoalivioPharmacy.Data.Entities.MedicineType", b =>
+                {
+                    b.Navigation("ProductCategories");
+                });
+
             modelBuilder.Entity("ProntoalivioPharmacy.Data.Entities.Neighborhood", b =>
                 {
                     b.Navigation("Laboratories");
+                });
+
+            modelBuilder.Entity("ProntoalivioPharmacy.Data.Entities.Product", b =>
+                {
+                    b.Navigation("ProductCategories");
+
+                    b.Navigation("ProductImages");
                 });
 #pragma warning restore 612, 618
         }
