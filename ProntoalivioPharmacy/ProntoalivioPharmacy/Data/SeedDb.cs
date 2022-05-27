@@ -43,6 +43,10 @@ namespace ProntoalivioPharmacy.Data
                     new List<string>() {"acetaminofen.png"});
                 await AddProductAsync("Noxpirin", 1500M, 200F, new List<string>() { "Pastillas" },
                     new List<string>() { "noxpirin.png", "noxpirin1.png", "noxpirin2.png" });
+                await AddProductAsync("Dihidrocodeina", 3500M, 50F, new List<string>() { "Jarabes" },
+                    new List<string>() { "dihidrocodeina.png" });
+                await AddProductAsync("Pedyalite", 9500M, 20F, new List<string>() { "Jarabes", "Sueros" },
+                    new List<string>() { "pedyalite.png" });
                 await _context.SaveChangesAsync();
             }
         }
