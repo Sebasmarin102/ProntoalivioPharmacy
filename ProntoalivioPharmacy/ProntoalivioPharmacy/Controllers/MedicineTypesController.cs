@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProntoalivioPharmacy.Data;
 using ProntoalivioPharmacy.Data.Entities;
+using Vereyon.Web;
 
 namespace ProntoalivioPharmacy.Controllers
 {
@@ -10,9 +11,12 @@ namespace ProntoalivioPharmacy.Controllers
     public class MedicineTypesController : Controller
     {
         private readonly DataContext _context;
-        public MedicineTypesController(DataContext context)
+        private readonly IFlashMessage _flashMessage;
+
+        public MedicineTypesController(DataContext context, IFlashMessage flashMessage)
         {
             _context = context;
+            _flashMessage = flashMessage;
         }
         public async Task<IActionResult> Index()
         {
@@ -148,6 +152,7 @@ namespace ProntoalivioPharmacy.Controllers
             MedicineType medicinetype = await _context.MedicineTypes.FindAsync(id);
             _context.MedicineTypes.Remove(medicinetype);
             await _context.SaveChangesAsync();
+            _flashMessage.Info("Tipo de medicamento eliminado.");
             return RedirectToAction(nameof(Index));
         }
     }
