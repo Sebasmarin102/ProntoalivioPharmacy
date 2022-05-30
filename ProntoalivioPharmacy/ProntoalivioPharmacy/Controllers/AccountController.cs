@@ -128,7 +128,7 @@ namespace ProntoalivioPharmacy.Controllers
                 Response response = _mailHelper.SendMail(
                     $"{model.FirstName} {model.LastName}",
                     model.Username,
-                    "Shopping - Confirmación de Email",
+                    "PRONTOALIVIO - Confirmación de Email",
                     $"<h1>Prontoalivio - Confirmación de Email</h1>" +
                         $"Para habilitar el usuario por favor hacer clic en el siguiente link:, " +
                         $"<hr/><br/><p><a href = \"{tokenLink}\">Confirmar Email</a></p>");
@@ -286,7 +286,7 @@ namespace ProntoalivioPharmacy.Controllers
                 _mailHelper.SendMail(
                     $"{user.FullName}",
                     model.Email,
-                    "Shopping - Recuperación de Contraseña",
+                    "PRONTOALIVIO - Recuperación de Contraseña",
                     $"<h1>Prontoalivio - Recuperación de Contraseña</h1>" +
                     $"Para recuperar la contraseña haga click en el siguiente enlace:" +
                     $"<p><a href = \"{link}\">Reset Password</a></p>");

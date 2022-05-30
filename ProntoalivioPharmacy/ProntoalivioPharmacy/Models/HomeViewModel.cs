@@ -1,10 +1,12 @@
-﻿using ProntoalivioPharmacy.Data.Entities;
+﻿using ProntoalivioPharmacy.Common;
+using ProntoalivioPharmacy.Data.Entities;
 
 namespace ProntoalivioPharmacy.Models
 {
     public class HomeViewModel
     {
-        public ICollection<Product> Products { get; set; }
+        public PaginatedList<Product> Products { get; set; }
         public float Quantity { get; set; }
+        public IEnumerable<MedicineType> MedicineTypes { get; set; }
     }
 }
