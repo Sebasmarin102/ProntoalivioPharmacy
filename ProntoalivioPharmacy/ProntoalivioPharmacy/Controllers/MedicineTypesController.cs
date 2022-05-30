@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProntoalivioPharmacy.Data;
 using ProntoalivioPharmacy.Data.Entities;
+using ProntoalivioPharmacy.Helpers;
 using Vereyon.Web;
+using static ProntoalivioPharmacy.Helpers.ModalHelper;
 
 namespace ProntoalivioPharmacy.Controllers
 {
@@ -20,7 +22,9 @@ namespace ProntoalivioPharmacy.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            return View(await _context.MedicineTypes.ToListAsync());
+            return View(await _context.MedicineTypes
+                .Include(m => m.ProductCategories)
+                .ToListAsync());
         }
         public async Task<IActionResult> Details(int? id)
         {
@@ -38,122 +42,92 @@ namespace ProntoalivioPharmacy.Controllers
 
             return View(medicinetype);
         }
-        public IActionResult Create()
-        {
-            return View();
-        }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(MedicineType medicinetype)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Add(medicinetype);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateException dbUpdateException)
-                {
-                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
-                    {
-                        ModelState.AddModelError(string.Empty, "Ya existe un tipo de medicina con el mismo nombre.");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ModelState.AddModelError(string.Empty, exception.Message);
-                }
-
-            }
-
-            return View(medicinetype);
-        }
-
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            MedicineType medicinetype = await _context.MedicineTypes.FindAsync(id);
-            if (medicinetype == null)
-            {
-                return NotFound();
-            }
-
-            return View(medicinetype);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, MedicineType medicinetype)
-        {
-            if (id != medicinetype.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(medicinetype);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateException dbUpdateException)
-                {
-                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
-                    {
-                        ModelState.AddModelError(string.Empty, "Ya existe un tipo de medicina con el mismo nombre.");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ModelState.AddModelError(string.Empty, exception.Message);
-                }
-
-            }
-            return View(medicinetype);
-        }
-
+        [NoDirectAccess]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            MedicineType medicineType = await _context.MedicineTypes.FirstOrDefaultAsync(c => c.Id == id);
+            try
             {
-                return NotFound();
+                _context.MedicineTypes.Remove(medicineType);
+                await _context.SaveChangesAsync();
+                _flashMessage.Info("Registro borrado.");
+            }
+            catch
+            {
+                _flashMessage.Danger("No se puede borrar el tipo de medicamento/producto porque tiene registros relacionados.");
             }
 
-            MedicineType medicinetypes = await _context.MedicineTypes
-                .FirstOrDefaultAsync(c => c.Id == id);
-            if (medicinetypes == null)
-            {
-                return NotFound();
-            }
-
-            return View(medicinetypes);
-        }
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            MedicineType medicinetype = await _context.MedicineTypes.FindAsync(id);
-            _context.MedicineTypes.Remove(medicinetype);
-            await _context.SaveChangesAsync();
-            _flashMessage.Info("Tipo de medicamento eliminado.");
             return RedirectToAction(nameof(Index));
         }
+
+        [NoDirectAccess]
+        public async Task<IActionResult> AddOrEdit(int id = 0)
+        {
+            if (id == 0)
+            {
+                return View(new MedicineType());
+            }
+            else
+            {
+                MedicineType medicineType = await _context.MedicineTypes.FindAsync(id);
+                if (medicineType == null)
+                {
+                    return NotFound();
+                }
+
+                return View(medicineType);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddOrEdit(int id, MedicineType medicineType)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (id == 0) //Insert
+                    {
+                        _context.Add(medicineType);
+                        await _context.SaveChangesAsync();
+                        _flashMessage.Info("Registro creado.");
+                    }
+                    else //Update
+                    {
+                        _context.Update(medicineType);
+                        await _context.SaveChangesAsync();
+                        _flashMessage.Info("Registro actualizado.");
+                    }
+                }
+                catch (DbUpdateException dbUpdateException)
+                {
+                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
+                    {
+                        _flashMessage.Danger("Ya existe un tipo de medicamento/producto con el mismo nombre.");
+                    }
+                    else
+                    {
+                        _flashMessage.Danger(dbUpdateException.InnerException.Message);
+                    }
+                    return View(medicineType);
+                }
+                catch (Exception exception)
+                {
+                    _flashMessage.Danger(exception.Message);
+                    return View(medicineType);
+                }
+
+                return Json(new { isValid = true, html = ModalHelper.RenderRazorViewToString(this, "_ViewAll", 
+                    _context.MedicineTypes.Include(c => c.ProductCategories).ToList()) });
+
+            }
+
+            return Json(new { isValid = false, html = ModalHelper.RenderRazorViewToString(this, "AddOrEdit", 
+                medicineType) });
+        }
+
+
     }
 }
