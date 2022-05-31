@@ -26,36 +26,20 @@ namespace ProntoalivioPharmacy.Controllers
                 .Include(m => m.ProductCategories)
                 .ToListAsync());
         }
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            MedicineType medicinetype = await _context.MedicineTypes
-                .FirstOrDefaultAsync(c => c.Id == id);
-            if (medicinetype == null)
-            {
-                return NotFound();
-            }
-
-            return View(medicinetype);
-        }
 
         [NoDirectAccess]
         public async Task<IActionResult> Delete(int? id)
         {
-            MedicineType medicineType = await _context.MedicineTypes.FirstOrDefaultAsync(c => c.Id == id);
+            MedicineType medicinetype = await _context.MedicineTypes.FirstOrDefaultAsync(c => c.Id == id);
             try
             {
-                _context.MedicineTypes.Remove(medicineType);
+                _context.MedicineTypes.Remove(medicinetype);
                 await _context.SaveChangesAsync();
                 _flashMessage.Info("Registro borrado.");
             }
             catch
             {
-                _flashMessage.Danger("No se puede borrar el tipo de medicamento/producto porque tiene registros relacionados.");
+                _flashMessage.Danger("No se puede borrar el medicamento/prodcuto porque tiene registros relacionados.");
             }
 
             return RedirectToAction(nameof(Index));

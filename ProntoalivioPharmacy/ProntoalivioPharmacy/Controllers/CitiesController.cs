@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProntoalivioPharmacy.Data;
 using ProntoalivioPharmacy.Data.Entities;
+using ProntoalivioPharmacy.Helpers;
 using ProntoalivioPharmacy.Models;
+using Vereyon.Web;
+using static ProntoalivioPharmacy.Helpers.ModalHelper;
 
 namespace ProntoalivioPharmacy.Controllers
 {
@@ -12,16 +14,19 @@ namespace ProntoalivioPharmacy.Controllers
     public class CitiesController : Controller
     {
         private readonly DataContext _context;
+        private readonly IFlashMessage _flashMessage;
 
-        public CitiesController(DataContext context)
+        public CitiesController(DataContext context, IFlashMessage flashMessage)
         {
             _context = context;
+            _flashMessage = flashMessage;
         }
 
         public async Task<IActionResult> Index()
         {
             return View(await _context.Cities
                 .Include(c => c.Neighborhoods)
+                .ThenInclude(s => s.Laboratories)
                 .ToListAsync());
         }
 
@@ -63,72 +68,11 @@ namespace ProntoalivioPharmacy.Controllers
             return View(neighborhood);
         }
 
-        public async Task<IActionResult> DetailsLaboratory(int? id)
+        [NoDirectAccess]
+        public async Task<IActionResult> AddNeighborhood(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            Laboratory laboratory = await _context.Laboratories
-                .Include(l => l.Neighborhood)
-                .FirstOrDefaultAsync(l => l.Id == id);
-            if (laboratory == null)
-            {
-                return NotFound();
-            }
-
-            return View(laboratory);
-        }
-
-        public IActionResult Create()
-        {
-            City city = new() { Neighborhoods = new List<Neighborhood>() };
-            return View(city);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(City city)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Add(city);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateException dbUpdateException)
-                {
-                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
-                    {
-                        ModelState.AddModelError(string.Empty, "Ya existe una ciudad con el mismo nombre.");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ModelState.AddModelError(string.Empty, exception.Message);
-                }
-
-            }
-
-            return View(city);
-        }
-
-        public async Task<IActionResult> AddNeighborhood(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             City city = await _context.Cities.FindAsync(id);
-            if(city == null) 
+            if (city == null)
             {
                 return NotFound();
             }
@@ -157,7 +101,13 @@ namespace ProntoalivioPharmacy.Controllers
                     };
                     _context.Add(neighborhood);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Details), new { Id = model.CityId });
+                    City city = await _context.Cities
+                        .Include(c => c.Neighborhoods)
+                        .ThenInclude(s => s.Laboratories)
+                        .FirstOrDefaultAsync(c => c.Id == model.CityId);
+                    _flashMessage.Info("Registro creado.");
+                    return Json(new { isValid = true, html = ModalHelper.RenderRazorViewToString(this, "_ViewAllNeighborhoods", city) });
+
                 }
                 catch (DbUpdateException dbUpdateException)
                 {
@@ -177,16 +127,12 @@ namespace ProntoalivioPharmacy.Controllers
 
             }
 
-            return View(model);
+            return Json(new { isValid = false, html = ModalHelper.RenderRazorViewToString(this, "AddNeighborhood", model) });
         }
 
-        public async Task<IActionResult> AddLaboratory(int? id)
+        [NoDirectAccess]
+        public async Task<IActionResult> AddLaboratory(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             Neighborhood neighborhood = await _context.Neighborhoods.FindAsync(id);
             if (neighborhood == null)
             {
@@ -216,7 +162,12 @@ namespace ProntoalivioPharmacy.Controllers
                     };
                     _context.Add(laboratory);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(DetailsNeighborhood), new { Id = model.NeighborhoodId });
+                    Neighborhood neighborhood = await _context.Neighborhoods
+                        .Include(s => s.Laboratories)
+                        .FirstOrDefaultAsync(c => c.Id == model.NeighborhoodId);
+                    _flashMessage.Confirmation("Registro creado.");
+                    return Json(new { isValid = true, html = ModalHelper.RenderRazorViewToString(this, "_ViewAllLaboratories", neighborhood) });
+
                 }
                 catch (DbUpdateException dbUpdateException)
                 {
@@ -236,71 +187,12 @@ namespace ProntoalivioPharmacy.Controllers
 
             }
 
-            return View(model);
+            return Json(new { isValid = false, html = ModalHelper.RenderRazorViewToString(this, "AddNeighborhood", model) });
         }
 
-        public async Task<IActionResult> Edit(int? id)
+        [NoDirectAccess]
+        public async Task<IActionResult> EditNeighborhood(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            City city = await _context.Cities
-                .Include(c => c.Neighborhoods)
-                .FirstOrDefaultAsync(c => c.Id == id);
-            if (city == null)
-            {
-                return NotFound();
-            }
-
-            return View(city);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, City city)
-        {
-            if (id != city.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(city);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateException dbUpdateException)
-                {
-                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
-                    {
-                        ModelState.AddModelError(string.Empty, "Ya existe una ciudad con el mismo nombre.");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ModelState.AddModelError(string.Empty, exception.Message);
-                }
-
-            }
-            return View(city);
-        }
-
-        public async Task<IActionResult> EditNeighborhood(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             Neighborhood neighborhood = await _context.Neighborhoods
                 .Include(n => n.City)
                 .FirstOrDefaultAsync(n => n.Id == id);
@@ -338,8 +230,14 @@ namespace ProntoalivioPharmacy.Controllers
                         Name = model.Name,
                     };
                     _context.Update(neighborhood);
+                    City city = await _context.Cities
+                        .Include(c => c.Neighborhoods)
+                        .ThenInclude(s => s.Laboratories)
+                        .FirstOrDefaultAsync(c => c.Id == model.CityId);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Details), new { Id = model.CityId });
+                    _flashMessage.Confirmation("Registro actualizado.");
+                    return Json(new { isValid = true, html = ModalHelper.RenderRazorViewToString(this, "_ViewAllNeighborhoods", city) });
+
                 }
                 catch (DbUpdateException dbUpdateException)
                 {
@@ -358,16 +256,13 @@ namespace ProntoalivioPharmacy.Controllers
                 }
 
             }
-            return View(model);
+
+            return Json(new { isValid = false, html = ModalHelper.RenderRazorViewToString(this, "EditNeighborhood", model) });
         }
 
-        public async Task<IActionResult> EditLaboratory(int? id)
+        [NoDirectAccess]
+        public async Task<IActionResult> EditLaboratory(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             Laboratory laboratory = await _context.Laboratories
                 .Include(l => l.Neighborhood)
                 .FirstOrDefaultAsync(l => l.Id == id);
@@ -406,7 +301,12 @@ namespace ProntoalivioPharmacy.Controllers
                     };
                     _context.Update(laboratory);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(DetailsNeighborhood), new { Id = model.NeighborhoodId });
+                    Neighborhood neighborhood = await _context.Neighborhoods
+                        .Include(s => s.Laboratories)
+                        .FirstOrDefaultAsync(c => c.Id == model.NeighborhoodId);
+                    _flashMessage.Confirmation("Registro actualizado.");
+                    return Json(new { isValid = true, html = ModalHelper.RenderRazorViewToString(this, "_ViewAllLaboratories", neighborhood) });
+
                 }
                 catch (DbUpdateException dbUpdateException)
                 {
@@ -425,9 +325,11 @@ namespace ProntoalivioPharmacy.Controllers
                 }
 
             }
-            return View(model);
+
+            return Json(new { isValid = false, html = ModalHelper.RenderRazorViewToString(this, "EditLaboratory", model) });
         }
 
+        [NoDirectAccess]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -435,87 +337,122 @@ namespace ProntoalivioPharmacy.Controllers
                 return NotFound();
             }
 
-            City city = await _context.Cities
-                .Include(c => c.Neighborhoods)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            City city = await _context.Cities.FirstOrDefaultAsync(c => c.Id == id);
             if (city == null)
             {
                 return NotFound();
             }
 
-            return View(city);
-        }
+            try
+            {
+                _context.Cities.Remove(city);
+                await _context.SaveChangesAsync();
+                _flashMessage.Info("Registro borrado.");
+            }
+            catch
+            {
+                _flashMessage.Danger("No se puede borrar el país porque tiene registros relacionados.");
+            }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            City city = await _context.Cities.FindAsync(id);
-            _context.Cities.Remove(city);
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> DeleteNeighborhood(int? id)
+        [NoDirectAccess]
+        public async Task<IActionResult> AddOrEdit(int id = 0)
         {
-            if (id == null)
+            if (id == 0)
             {
-                return NotFound();
+                return View(new City());
             }
-
-            Neighborhood neighborhood = await _context.Neighborhoods
-                .Include(n => n.City)
-                .Include(n => n.Laboratories)
-                .FirstOrDefaultAsync(n => n.Id == id);
-            if (neighborhood == null)
+            else
             {
-                return NotFound();
-            }
+                City city = await _context.Cities.FindAsync(id);
+                if (city == null)
+                {
+                    return NotFound();
+                }
 
-            return View(neighborhood);
+                return View(city);
+            }
         }
 
-        [HttpPost, ActionName("DeleteNeighborhood")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteNeighborhoodConfirmed(int id)
+        public async Task<IActionResult> AddOrEdit(int id, City city)
         {
-            Neighborhood neighborhood = await _context.Neighborhoods
-                .Include(n => n.City)
-                .FirstOrDefaultAsync(n => n.Id == id);
-            _context.Neighborhoods.Remove(neighborhood);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Details), new { Id = neighborhood.City.Id });
-        }
-
-        public async Task<IActionResult> DeleteLaboratory(int? id)
-        {
-            if (id == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
+                try
+                {
+                    if (id == 0) //Insert
+                    {
+                        _context.Add(city);
+                        await _context.SaveChangesAsync();
+                        _flashMessage.Info("Registro creado.");
+                    }
+                    else //Update
+                    {
+                        _context.Update(city);
+                        await _context.SaveChangesAsync();
+                        _flashMessage.Info("Registro actualizado.");
+                    }
+                    return Json(new
+                    {
+                        isValid = true,
+                        html = ModalHelper.RenderRazorViewToString(
+                            this,
+                            "_ViewAll",
+                            _context.Cities
+                                .Include(c => c.Neighborhoods)
+                                .ThenInclude(s => s.Laboratories)
+                                .ToList())
+                    });
+                }
+                catch (DbUpdateException dbUpdateException)
+                {
+                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
+                    {
+                        _flashMessage.Danger("Ya existe una ciudad con el mismo nombre.");
+                    }
+                    else
+                    {
+                        _flashMessage.Danger(dbUpdateException.InnerException.Message);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    _flashMessage.Danger(exception.Message);
+                }
             }
 
+            return Json(new { isValid = false, html = ModalHelper.RenderRazorViewToString(this, "AddOrEdit", city) });
+        }
+
+        [NoDirectAccess]
+        public async Task<IActionResult> DeleteLaboratory(int id)
+        {
             Laboratory laboratory = await _context.Laboratories
-                .Include(l => l.Neighborhood)
-                .FirstOrDefaultAsync(l => l.Id == id);
+                .Include(c => c.Neighborhood)
+                .FirstOrDefaultAsync(c => c.Id == id);
             if (laboratory == null)
             {
                 return NotFound();
             }
 
-            return View(laboratory);
-        }
+            try
+            {
+                _context.Laboratories.Remove(laboratory);
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                _flashMessage.Danger("No se puede borrar el laboratorio porque tiene registros relacionados.");
+            }
 
-        [HttpPost, ActionName("DeleteLaboratory")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteLaboratoryConfirmed(int id)
-        {
-            Laboratory laboratory = await _context.Laboratories
-                .Include(l => l.Neighborhood)
-                .FirstOrDefaultAsync(l => l.Id == id);
-            _context.Laboratories.Remove(laboratory);
-            await _context.SaveChangesAsync();
+            _flashMessage.Info("Registro borrado.");
             return RedirectToAction(nameof(DetailsNeighborhood), new { Id = laboratory.Neighborhood.Id });
         }
+
 
     }
 }

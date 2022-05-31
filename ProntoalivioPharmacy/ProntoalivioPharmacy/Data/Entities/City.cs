@@ -16,5 +16,9 @@ namespace ProntoalivioPharmacy.Data.Entities
         public int NeighborhoodsNumber => Neighborhoods == null ? 0 : Neighborhoods.Count;
 
         public ICollection<User> Users { get; set; }
+
+        [Display(Name = "Laboratorios/Farmacias")]
+        public int LaboratoriesNumber => Neighborhoods == null ? 0 : Neighborhoods.Sum(s => s.LaboratoriesNumber);
+
     }
 }
