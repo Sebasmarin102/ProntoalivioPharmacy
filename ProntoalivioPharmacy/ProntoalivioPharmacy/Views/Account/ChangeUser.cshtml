@@ -19,11 +19,7 @@
 
             <div class="form-group mt-2">
                 <input type="submit" value="Guardar" class="btn btn-outline-primary" />
-                <!--<a asp-action="ChangePassword" class="btn btn-outline-secondary">Cambiar Contraseña</a>-->
-                <th>
-                    <a onclick="showInPopup('@Url.Action("ChangePassword", "Account", new { id = 0 }, Context.Request.Scheme)', 
-                        'Cambiar contraseña')" class="btn btn-outline-secondary">Cambiar contraseña</a>
-                </th>
+                <a asp-action="ChangePassword" class="btn btn-outline-secondary">Cambiar Contraseña</a>
             </div>                      
         </form>
     </div>
