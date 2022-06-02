@@ -187,6 +187,9 @@ namespace ProntoalivioPharmacy.Data
                                 new Laboratory { Name = "Pasteur" },
                                 new Laboratory { Name = "La rebaja" },
                                 new Laboratory { Name = "La Y" },
+                                new Laboratory { Name = "Farmacias Montevideo" },
+                                new Laboratory { Name = "Farmacias A Buen Precio" },
+                                new Laboratory { Name = "Farmacias San José" },
                             }
                         },
                         new Neighborhood {
@@ -196,6 +199,31 @@ namespace ProntoalivioPharmacy.Data
                                 new Laboratory { Name = "Cruz verde" },
                                 new Laboratory { Name = "Drogueria Alemana" },
                                 new Laboratory { Name = "Farmatodo" },
+                                new Laboratory { Name = "Botica Trébol Verde" },
+                                new Laboratory { Name = "Botica Paraguay" },
+                                new Laboratory { Name = "Farmacias Hernández" },
+                            }
+                        },
+                        new Neighborhood {
+                            Name = "Caicedo",
+                            Laboratories = new List<Laboratory>()
+                            {
+                                new Laboratory { Name = "Tres esquinas" },
+                                new Laboratory { Name = "Farmacia la estrechura" },
+                                new Laboratory { Name = "Farmacias Para Todos" },
+                                new Laboratory { Name = "Farmacias El Especialista" },
+                                new Laboratory { Name = "Farmacia De la Ocho" },
+                            }
+                        },
+                        new Neighborhood {
+                            Name = "Poblado",
+                            Laboratories = new List<Laboratory>()
+                            {
+                                new Laboratory { Name = "La Esquina Natural" },
+                                new Laboratory { Name = "Dietética Pensamiento Natural" },
+                                new Laboratory { Name = "Esencia Verde" },
+                                new Laboratory { Name = "Farm Fresh" },
+                                new Laboratory { Name = "Farma Integral" },
                             }
                         }
                     }
@@ -209,18 +237,22 @@ namespace ProntoalivioPharmacy.Data
                             Name = "Usme",
                             Laboratories = new List<Laboratory>()
                             {
-                                new Laboratory { Name = "Pasteur 2" },
-                                new Laboratory { Name = "La rebaja 2" },
-                                new Laboratory { Name = "La Y 2" },
+                                new Laboratory { Name = "Farmacia Élite" },
+                                new Laboratory { Name = "Farmacia HomeMedica" },
+                                new Laboratory { Name = "Farmacia MediCare" },
+                                new Laboratory { Name = "Farmacia Remedio Total" },
+                                new Laboratory { Name = "Farmacia La Central" },
                             }
                         },
                         new Neighborhood {
                             Name = "Bosa",
                             Laboratories = new List<Laboratory>()
                             {
-                                new Laboratory { Name = "Cruz verde 2" },
-                                new Laboratory { Name = "Drogueria Alemana 2" },
-                                new Laboratory { Name = "Farmatodo 2" },
+                                new Laboratory { Name = "Sinergia Farm" },
+                                new Laboratory { Name = "Farmacia Génesis" },
+                                new Laboratory { Name = "Farmacia Medicheckn" },
+                                new Laboratory { Name = "Focus Farm" },
+                                new Laboratory { Name = "Dakota Farma" },
                             }
                         }
                     }
@@ -234,18 +266,53 @@ namespace ProntoalivioPharmacy.Data
                             Name = "Ciudad Jardin",
                             Laboratories = new List<Laboratory>()
                             {
-                                new Laboratory { Name = "Pasteur 3" },
-                                new Laboratory { Name = "La rebaja 3" },
-                                new Laboratory { Name = "La Y 3" },
+                                new Laboratory { Name = "Farma Milenium" },
+                                new Laboratory { Name = "Farmacia Ámbar" },
+                                new Laboratory { Name = "Farmacia La Pacífica" },
+                                new Laboratory { Name = "Farmacia Cura Y Bienestar" },
+                                new Laboratory { Name = "Farmacia Néctar Salud" },
+                                new Laboratory { Name = "La Casa De La Medicina" },
                             }
                         },
                         new Neighborhood {
                             Name = "San Fernando",
                             Laboratories = new List<Laboratory>()
                             {
-                                new Laboratory { Name = "Cruz verde 3" },
-                                new Laboratory { Name = "Drogueria Alemana 3" },
-                                new Laboratory { Name = "Farmatodo 3" },
+                                new Laboratory { Name = "Farmacia La Real" },
+                                new Laboratory { Name = "Farmacia La Imperial" },
+                                new Laboratory { Name = "Farmacia Prisma" },
+                                new Laboratory { Name = "Farmacia Vitality" },
+                                new Laboratory { Name = "Farmacia Atlas" },
+                                new Laboratory { Name = "ExtraFarma" },
+                            }
+                        }
+                    }
+                });
+                _context.Cities.Add(new City
+                {
+                    Name = "Barranquilla",
+                    Neighborhoods = new List<Neighborhood>()
+                    {
+                        new Neighborhood {
+                            Name = "Ciudad Jardin",
+                            Laboratories = new List<Laboratory>()
+                            {
+                                new Laboratory { Name = "Sinergia Farm" },
+                                new Laboratory { Name = "Farmacia Génesis" },
+                                new Laboratory { Name = "Farmacia Medicheckn" },
+                                new Laboratory { Name = "Focus Farm" },
+                                new Laboratory { Name = "Dakota Farma" },
+                            }
+                        },
+                        new Neighborhood {
+                            Name = "San Fernando",
+                            Laboratories = new List<Laboratory>()
+                            {
+                                new Laboratory { Name = "Tres esquinas" },
+                                new Laboratory { Name = "Farmacia la estrechura" },
+                                new Laboratory { Name = "Farmacias Para Todos" },
+                                new Laboratory { Name = "Farmacias El Especialista" },
+                                new Laboratory { Name = "Farmacia De la Ocho" },
                             }
                         }
                     }

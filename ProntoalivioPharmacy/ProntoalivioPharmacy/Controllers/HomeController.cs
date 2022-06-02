@@ -7,6 +7,7 @@ using ProntoalivioPharmacy.Data.Entities;
 using ProntoalivioPharmacy.Helpers;
 using ProntoalivioPharmacy.Models;
 using System.Diagnostics;
+using Vereyon.Web;
 
 namespace ProntoalivioPharmacy.Controllers
 {
@@ -16,14 +17,16 @@ namespace ProntoalivioPharmacy.Controllers
         private readonly DataContext _context;
         private readonly IUserHelper _userHelper;
         private readonly IOrdersHelper _ordersHelper;
+        private readonly IFlashMessage _flashMessage;
 
         public HomeController(ILogger<HomeController> logger, DataContext context, IUserHelper userHelper,
-            IOrdersHelper ordersHelper)
+            IOrdersHelper ordersHelper, IFlashMessage flashMessage)
         {
             _logger = logger;
             _context = context;
             _userHelper = userHelper;
             _ordersHelper = ordersHelper;
+            _flashMessage = flashMessage;
         }
 
         public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
@@ -104,6 +107,7 @@ namespace ProntoalivioPharmacy.Controllers
 
             if (!User.Identity.IsAuthenticated)
             {
+                _flashMessage.Danger("Debes iniciar sesión o registrarse en nuestro sitio web");
                 return RedirectToAction("Login", "Account");
             }
 
@@ -126,6 +130,7 @@ namespace ProntoalivioPharmacy.Controllers
                 User = user
             };
 
+            _flashMessage.Confirmation("Se ha agregado el producto al carrito de compras");
             _context.TemporalSales.Add(temporalSale);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -301,6 +306,7 @@ namespace ProntoalivioPharmacy.Controllers
                 return NotFound();
             }
 
+            _flashMessage.Danger("Producto eliminado del carrito de compras.");
             _context.TemporalSales.Remove(temporalSale);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(ShowCart));
