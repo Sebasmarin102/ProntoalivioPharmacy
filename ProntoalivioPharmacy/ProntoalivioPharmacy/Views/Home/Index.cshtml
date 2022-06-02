@@ -19,37 +19,55 @@
     }
 </style>
 
-<h1>FARMACIA PRONTOALIVIO</h1>
-<h3>Tipo de medicamento/producto</h3>
-
-<div class="mb-2">
-    @foreach (var item in Model.MedicineTypes)
-    {
-        <span> <a href="@Url.Action("Index", "Home", new { searchString = item.Name})" > @item.Name&nbsp;</a></span>
-    }
-</div>
-<hr />
-
-<div class="mb-2">
-    <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]">Ordenar por Nombre</a>&nbsp;&nbsp;
-    <a asp-action="Index" asp-route-sortOrder="@ViewData["PriceSortParm"]">Ordenar por Precio</a>
-</div>
-
-<form asp-action="Index" method="get">
-    <div class="form-actions no-color">
-        <p>
-            Buscar por nombre o categoría: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
-            <input type="submit" value="Buscar" class="btn btn-warning" />
-            <a asp-action="Index" class="btn btn-success">Ver Todos los Productos</a>
-        </p>
+<div class="col-md-4 offset-4">
+    <div>
+        <img src="~/images/FARMACIA.png" style="width:500px; height:100px;" />
     </div>
-</form>
+</div>
 
+<hr/>
 
-@if(Model.Quantity > 0)
-{
-    <a asp-action="ShowCart" class="btn btn-outline-primary">Ver Carro de Compras (@Model.Quantity)</a>
-}
+<div class="row">
+    <div class="col-md-4">
+        <div class="nav-item dropdown">
+            <button type="button" class="btn btn-outline-dark dropdown-toggle"  id="simpleDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Tipo de medicamento / producto
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="mb-2">        
+                    @foreach (var item in Model.MedicineTypes)
+                    {
+                        <a class="dropdown-item" href="@Url.Action("Index", "Home", new { searchString = item.Name})" > @item.Name&nbsp;</a>
+                    }        
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <form asp-action="Index" method="get">
+            <div class="form-actions no-color">                    
+                <div class="input-group">
+                    <input type="text" class="form-control" name="SearchString" value="@ViewData["CurrentFilter"]" placeholder="Escribe el nombre del producto o categoría">
+                    <input type="submit" value="Buscar" class="btn btn-outline-dark"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4" align="right">
+        <div class="nav-item dropdown">
+            <button type="button" class="btn btn-outline-white dropdown-toggle"  id="simpleDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <a></a><i class="fa-solid fa-filter"></i> Filtro</a>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="mb-2">    
+                    <a class="dropdown-item" asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]">Ordenar por nombre</a>
+                    <a class="dropdown-item" asp-action="Index" asp-route-sortOrder="@ViewData["PriceSortParm"]">Ordenar por precio</a>
+                </div>
+            </div>
+            <a asp-action="Index" class="btn btn-white"><i class="fa-solid fa-filter-circle-xmark"></i> Eliminar filtro</a>
+        </div>
+    </div>
+</div>
 
 <div class="row row-cols-1 row-cols-md-4 g-4 mt-1">
     @if (Model.Products.Count() > 0)
@@ -67,8 +85,8 @@
                         <h5 class="text-muted">@Html.DisplayFor(modelItem => item.Price)</h5>
                     </div>
                     <div class="card-footer text-center">
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-secondary">Detalles</a>
-                        <a asp-action="Add" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Agregar al carrito</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary"> <i class="fa-solid fa-circle-info"></i></a>
+                        <a asp-action="Add" asp-route-id="@item.Id" class="btn btn-sm btn-outline-success">Agregar <i class="fa-solid fa-cart-plus"></i></a>
                     </div>
                 </div>
             </div>
@@ -85,20 +103,20 @@
     var nextDisabled = !Model.Products.HasNextPage ? "disabled" : "";
 }
 
-<div class="mt-5">
+<div class="mt-5" align="right">
     <a asp-action="Index"
        asp-route-sortOrder="@ViewData["CurrentSort"]"
        asp-route-pageNumber="@(Model.Products.PageIndex - 1)"
        asp-route-currentFilter="@ViewData["CurrentFilter"]"
-       class="btn btn-warning @prevDisabled">
-        Anterior
+       class="btn btn-outline-danger @prevDisabled">
+        <i class="fa-solid fa-angles-left"></i>
     </a>
     <a asp-action="Index"
        asp-route-sortOrder="@ViewData["CurrentSort"]"
        asp-route-pageNumber="@(Model.Products.PageIndex + 1)"
        asp-route-currentFilter="@ViewData["CurrentFilter"]"
-       class="btn btn-success @nextDisabled">
-        Siguiente
+       class="btn btn-outline-danger @nextDisabled">
+        <i class="fa-solid fa-angles-right"></i>
     </a>
 </div>
 

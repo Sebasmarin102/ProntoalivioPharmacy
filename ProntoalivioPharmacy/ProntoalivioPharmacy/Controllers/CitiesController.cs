@@ -10,7 +10,7 @@ using static ProntoalivioPharmacy.Helpers.ModalHelper;
 
 namespace ProntoalivioPharmacy.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    
     public class CitiesController : Controller
     {
         private readonly DataContext _context;
@@ -68,6 +68,7 @@ namespace ProntoalivioPharmacy.Controllers
             return View(neighborhood);
         }
 
+        [Authorize(Roles = "Admin")]
         [NoDirectAccess]
         public async Task<IActionResult> AddNeighborhood(int id)
         {
@@ -85,6 +86,7 @@ namespace ProntoalivioPharmacy.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddNeighborhood(NeighborhoodViewModel model)
@@ -130,6 +132,7 @@ namespace ProntoalivioPharmacy.Controllers
             return Json(new { isValid = false, html = ModalHelper.RenderRazorViewToString(this, "AddNeighborhood", model) });
         }
 
+        [Authorize(Roles = "Admin")]
         [NoDirectAccess]
         public async Task<IActionResult> AddLaboratory(int id)
         {
@@ -147,6 +150,7 @@ namespace ProntoalivioPharmacy.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddLaboratory(LaboratoryViewModel model)
@@ -190,6 +194,7 @@ namespace ProntoalivioPharmacy.Controllers
             return Json(new { isValid = false, html = ModalHelper.RenderRazorViewToString(this, "AddNeighborhood", model) });
         }
 
+        [Authorize(Roles = "Admin")]
         [NoDirectAccess]
         public async Task<IActionResult> EditNeighborhood(int id)
         {
@@ -211,6 +216,7 @@ namespace ProntoalivioPharmacy.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditNeighborhood(int id, NeighborhoodViewModel model)
@@ -260,6 +266,7 @@ namespace ProntoalivioPharmacy.Controllers
             return Json(new { isValid = false, html = ModalHelper.RenderRazorViewToString(this, "EditNeighborhood", model) });
         }
 
+        [Authorize(Roles = "Admin")]
         [NoDirectAccess]
         public async Task<IActionResult> EditLaboratory(int id)
         {
@@ -281,6 +288,7 @@ namespace ProntoalivioPharmacy.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditLaboratory(int id, LaboratoryViewModel model)
@@ -329,6 +337,7 @@ namespace ProntoalivioPharmacy.Controllers
             return Json(new { isValid = false, html = ModalHelper.RenderRazorViewToString(this, "EditLaboratory", model) });
         }
 
+        [Authorize(Roles = "Admin")]
         [NoDirectAccess]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -357,6 +366,7 @@ namespace ProntoalivioPharmacy.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         [NoDirectAccess]
         public async Task<IActionResult> AddOrEdit(int id = 0)
         {
@@ -376,6 +386,7 @@ namespace ProntoalivioPharmacy.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOrEdit(int id, City city)
@@ -428,6 +439,7 @@ namespace ProntoalivioPharmacy.Controllers
             return Json(new { isValid = false, html = ModalHelper.RenderRazorViewToString(this, "AddOrEdit", city) });
         }
 
+        [Authorize(Roles = "Admin")]
         [NoDirectAccess]
         public async Task<IActionResult> DeleteLaboratory(int id)
         {

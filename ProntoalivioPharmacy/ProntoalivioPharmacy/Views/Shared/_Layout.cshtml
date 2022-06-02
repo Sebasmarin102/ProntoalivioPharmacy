@@ -9,11 +9,11 @@
     <link rel="stylesheet" href="~/lib/datatables/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="~/lib/jqueryui/jquery-ui.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Shooping.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ProntoalivioPharmacy.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-success border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-danger border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand text-white" asp-area="" asp-controller="Home" asp-action="Index"><i class="fa-solid fa-hand-holding-medical"></i> PRONTOALIVIO</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -23,48 +23,53 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index"><i class="fa-solid fa-house"></i> INICIO</a>                            
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Políticas</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Cities" asp-action="Index"><i class="fa-solid fa-location-dot"></i> SEDES</a>
+                        </li>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("User"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Orders" asp-action="MyOrders"><i class="fa-solid fa-list-check"></i> MIS PEDIDOS</a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy"><i class="fa-solid fa-circle-question"></i> POLÍTICAS</a>
                         </li>
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                         {                            
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-white" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administración</a>
+                                <a class="nav-link dropdown-toggle text-white" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-sliders"></i> ADMINISTRACIÓN</a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Dashboard" asp-action="Index"><i class="fa fa-tachometer-alt text-danger"></i> Dashboard</a></li>
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><a class="dropdown-item" asp-area="" asp-controller="MedicineTypes" asp-action="Index"><i class="fa fa-list-1-2 text-danger"></i> Tipos de medicinas</a></li>
-                                    <li><a class="dropdown-item" asp-area="" asp-controller="Cities" asp-action="Index"><i class="fa fa-earth-americas text-danger"></i> Sedes</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="MedicineTypes" asp-action="Index"><i class="fa fa-list-1-2 text-danger"></i> Tipos de medicinas</a></li>                                    
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Orders" asp-action="Index"><i class="fa fa-bell text-danger"></i> Pedidos</a></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Products" asp-action="Index"><i class="fa fa-gifts text-danger"></i> Productos</a></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Users" asp-action="Index"><i class="fa fa-users text-danger"></i> Usuarios</a></li>
                                 </ul>
                             </li>
-                        }
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("User"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Orders" asp-action="MyOrders">Mis Pedidos</a>
-                            </li>
-                        }
+                        }                        
                     </ul>
                     
                     <ul class="nav navbar-nav navbar-right">
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="ChangeUser">@User.Identity.Name</a>
+                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="ShowCart"><i class="fa-solid fa-cart-shopping"></i> </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Logout">Cerrar Sesión</a>
+                                <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="ChangeUser"><i class="fa-solid fa-user"></i> @User.Identity.Name</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Logout"><i class="fa-solid fa-right-to-bracket"></i> CERRAR SESIÓN</a>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Login">Iniciar Sesión</a>
+                                <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Login"><i class="fa-solid fa-right-to-bracket"></i> INICIAR SESIÓN</a>
                             </li>
                         }
                     </ul>

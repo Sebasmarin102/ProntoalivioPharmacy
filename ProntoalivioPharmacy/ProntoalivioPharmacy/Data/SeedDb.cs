@@ -47,7 +47,54 @@ namespace ProntoalivioPharmacy.Data
                     new List<string>() { "dihidrocodeina.png" });
                 await AddProductAsync("Pedyalite", 9500M, 20F, new List<string>() { "Jarabes", "Sueros" },
                     new List<string>() { "pedyalite.png" });
+                await AddProductAsync("Jabon Intimo", 10000M, 150F, new List<string>() { "Higiene" },
+                    new List<string>() { "jabonintimo.png" });
+                await AddProductAsync("Electrolit", 5000M, 500F, new List<string>() { "Sueros", "Jarabes" },
+                    new List<string>() { "electrolic.png" });
+                await AddProductAsync("Adorem", 5900M, 200F, new List<string>() { "Jarabes" },
+                    new List<string>() { "adorem.png" });
+                await AddProductAsync("Aquasol x30", 5000M, 500F, new List<string>() { "Pastillas" },
+                    new List<string>() { "aquasol.png" });
+                await AddProductAsync("Cepillo dientes", 2000M, 500F, new List<string>() { "Higiene" },
+                    new List<string>() { "cepillo.png" });
+                await AddProductAsync("Crema N4", 1500M, 500F, new List<string>() { "Higiene" },
+                    new List<string>() { "creman4.png" });
+                await AddProductAsync("Pañales huggies", 5000M, 500F, new List<string>() { "Higiene" },
+                    new List<string>() { "huggies.png" });
+                await AddProductAsync("Tapabocas", 500M, 1000F, new List<string>() { "Higiene" },
+                    new List<string>() { "mascarilla.png" });
+                await AddProductAsync("Medicasp", 10000M, 100F, new List<string>() { "Higiene" },
+                    new List<string>() { "medicasp.png" });
+                await AddProductAsync("Shampoo H&S", 21000M, 50F, new List<string>() { "Higiene" },
+                    new List<string>() { "shampoo.png" });
+                await AddProductAsync("Desodorante", 15900M, 20F, new List<string>() { "Higiene" },
+                    new List<string>() { "desodorante.png" });
+                await AddProductAsync("Tramadol Inyección", 3900M, 20F, new List<string>() { "Inyecciones" },
+                    new List<string>() { "trama.png" });
+                await AddProductAsync("Betametasona Inyección", 3900M, 100F, new List<string>() { "Inyecciones" },
+                    new List<string>() { "BETAME.png" });
+                await AddProductAsync("Diclofenaco Inyección", 3900M, 200F, new List<string>() { "Inyecciones" },
+                    new List<string>() { "diclofenaco.png" });
+                await AddProductAsync("Dexametasona Inyección", 3900M, 150F, new List<string>() { "Inyecciones" },
+                    new List<string>() { "unnamed.png" });
+                await AddProductAsync("Suero Papeleta", 500M, 150F, new List<string>() { "Sueros", "Jarabes" },
+                    new List<string>() { "suero.png" });
+                await AddProductAsync("SueroX", 6900M, 250F, new List<string>() { "Sueros", "Jarabes" },
+                    new List<string>() { "suerox.png" });
+                await AddProductAsync("Aquilea Tos", 10900M, 10F, new List<string>() { "Jarabes" },
+                    new List<string>() { "tos.png" });
+                await AddProductAsync("Desloratadina", 4900M, 250F, new List<string>() { "Jarabes" },
+                    new List<string>() { "desloratadina.png" });
+                await AddProductAsync("Advil x10", 4900M, 250F, new List<string>() { "Pastillas" },
+                    new List<string>() { "advil.png" });
+                await AddProductAsync("Noraver x10", 11900M, 250F, new List<string>() { "Pastillas" },
+                    new List<string>() { "noraver.png" });
+                await AddProductAsync("Aspirina x10", 10000M, 250F, new List<string>() { "Pastillas" },
+                    new List<string>() { "aspirina.png" });
+
+
                 await _context.SaveChangesAsync();
+
             }
         }
 
